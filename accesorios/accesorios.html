@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Poleras - Distrito 21</title>
+<title>Accesorios - Distrito 21</title>
 <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -12,16 +12,17 @@
     <nav class="menu-superior">
         <a href="../index.html">Inicio</a>
         <a href="#">Acerca de</a>
-        <a href="#">Servicios</a>
-        <a href="#">Contacto</a>
-        <div id="abrir-carrito" class="carrito-icono">
-        🛒 <span id="contador-carrito">0</span>
-            </div>
+        
+        <a href="https://wa.me/75697356" target="_blank" rel="noopener noreferrer">Contacto</a>
+        
 
     </nav>
 </header>
-    <div class="bloque-titulo">
-        <h1 class="titulo-principal">Sección de Accesorios</h1>
+<div id="abrir-carrito" class="carrito-icono">
+        🛒 <span id="contador-carrito">0</span>
+            </div>
+    <div class="bloque-tituloseccion">
+        <h1 class="titulo-principalseccion">Sección de Accesorios</h1>
     </div>
 
 <div class="contenedor">
@@ -29,7 +30,7 @@
     <aside class="menu-lateral">
         <div class="overlay">
             <h3>Categorías</h3>
-            <a href="..poleras/poleras.html">Poleras</a>
+            <a href="../poleras/poleras.html">Poleras</a>
             <a href="../pantalones/pantalones.html">Pantalones</a>
             <a href="../zapatos/zapatos.html">Zapatos</a>
             <a href="accesorios.html">Accesorios</a>
@@ -53,7 +54,7 @@
             <p class="precio">Bs. 90</p>
 
 
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -70,7 +71,7 @@
             <p class="precio">Bs. 110</p>
 
 
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -87,7 +88,7 @@
             <p class="precio">Bs. 300</p>
 
             
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -105,7 +106,7 @@
 
             
             
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -122,7 +123,7 @@
             <p class="precio">Bs. 90</p>
 
             
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -139,7 +140,7 @@
             <p class="precio">Bs. 210</p>
 
             
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -156,7 +157,7 @@
             <p class="precio">Bs. 430</p>
 
              
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -173,7 +174,7 @@
             <p class="precio">Bs. 380</p>
 
             
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -190,7 +191,7 @@
             <p class="precio">Bs. 999</p>
 
             
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -213,6 +214,26 @@
 
     <div class="carrito-footer">
         <p>Total: <span id="total-carrito">Bs. 0</span></p>
+
+		<div class="formulario-cliente">
+
+		<input type="text" id="cliente-nombre" placeholder="Nombre completo">
+
+		<input type="text" id="cliente-telefono" placeholder="Teléfono">
+
+		<input type="text" id="cliente-direccion" placeholder="Dirección de entrega">
+
+		<select id="cliente-pago">
+		<option value="">Método de pago</option>
+		<option value="Efectivo">Efectivo</option>
+		<option value="QR">QR</option>
+		</select>
+
+		</div>
+
+	 <button id="btn-whatsapp" class="boton-whatsapp">
+            Finalizar compra por WhatsApp
+         </button>
     </div>
 
 </div>
@@ -306,7 +327,7 @@ document.querySelectorAll(".producto-card").forEach(card => {
         // Mensaje de agregado
         botonComprar.textContent = "✓ Agregado";
         setTimeout(() => {
-            botonComprar.textContent = "🛒 Comprar Ahora";
+            botonComprar.textContent = "🛒 Agregar Al Carrito";
         }, 1500);
     });
 

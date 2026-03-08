@@ -12,16 +12,19 @@
     <nav class="menu-superior">
         <a href="../index.html">Inicio</a>
         <a href="#">Acerca de</a>
-        <a href="#">Servicios</a>
-        <a href="#">Contacto</a>
-        <div id="abrir-carrito" class="carrito-icono">
+        
+        <a href="https://wa.me/75697356" target="_blank" rel="noopener noreferrer">Contacto</a>
+        
+
+    </nav>
+
+<div id="abrir-carrito" class="carrito-icono">
         🛒 <span id="contador-carrito">0</span>
             </div>
 
-    </nav>
 </header>
-    <div class="bloque-titulo">
-        <h1 class="titulo-principal">Sección de Poleras</h1>
+    <div class="bloque-tituloseccion">
+        <h1 class="titulo-principalseccion">Sección de Poleras</h1>
     </div>
 
 <div class="contenedor">
@@ -30,7 +33,7 @@
         <div class="overlay">
             <h3>Categorías</h3>
             <a href="../poleras/poleras.html">Poleras</a>
-            <a href="pantalones/pantalones.html">Pantalones</a>
+            <a href="pantalones.html">Pantalones</a>
             <a href="../zapatos/zapatos.html">Zapatos</a>
             <a href="../accesorios/accesorios.html">Accesorios</a>
         </div>
@@ -63,7 +66,7 @@
                     <a href="#" data-stock="2">XL</a>
                 </div>
             </div>
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -88,7 +91,7 @@
                     <a href="#" data-stock="3">XL</a>
                 </div>
             </div>
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -113,7 +116,7 @@
                     <a href="#" data-stock="0">XL</a>
                 </div>
             </div>
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -138,7 +141,7 @@
                     <a href="#" data-stock="2">XL</a>
                 </div>
             </div>
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 
@@ -163,7 +166,7 @@
                     <a href="#" data-stock="1">XL</a>
                 </div>
             </div>
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
 <!-- PRODUCTO 6 -->
@@ -187,7 +190,7 @@
                     <a href="#" data-stock="1">XL</a>
                 </div>
             </div>
-            <button class="boton-comprar">🛒 Comprar Ahora</button>
+            <button class="boton-comprar">🛒 Agregar Al Carrito</button>
         </div>
     </section>
     </div>
@@ -209,6 +212,27 @@
 
     <div class="carrito-footer">
         <p>Total: <span id="total-carrito">Bs. 0</span></p>
+
+<div class="formulario-cliente">
+
+		<input type="text" id="cliente-nombre" placeholder="Nombre completo">
+
+		<input type="text" id="cliente-telefono" placeholder="Teléfono">
+
+		<input type="text" id="cliente-direccion" placeholder="Dirección de entrega">
+
+		<select id="cliente-pago">
+		<option value="">Método de pago</option>
+		<option value="Efectivo">Efectivo</option>
+		<option value="QR">QR</option>
+		</select>
+
+		</div>
+
+	 <button id="btn-whatsapp" class="boton-whatsapp">
+            Finalizar compra por WhatsApp
+         </button>
+
     </div>
 
 </div>
@@ -305,7 +329,7 @@ document.querySelectorAll(".producto-card").forEach(card => {
         // Mensaje de agregado
         botonComprar.textContent = "✓ Agregado";
         setTimeout(() => {
-            botonComprar.textContent = "🛒 Comprar Ahora";
+            botonComprar.textContent = "🛒 Agregar Al Carrito";
         }, 1500);
     });
 

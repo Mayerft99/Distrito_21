@@ -1,7 +1,7 @@
 // carrito.js
 
 // Carrito global
-let carrito = [];
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
 // Función para agregar producto
 function agregarAlCarrito(producto) {
@@ -15,6 +15,9 @@ function agregarAlCarrito(producto) {
     }
 
     actualizarCarrito();
+}
+function guardarCarrito() {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
 }
 
 // Función para actualizar la lista del carrito
@@ -55,6 +58,7 @@ function actualizarCarrito() {
 
     totalCarrito.textContent = "Bs. " + total;
     contadorCarrito.textContent = carrito.length;
+    guardarCarrito();
 
     // Eventos para los botones dinámicos
     document.querySelectorAll(".aumentar").forEach(btn => {
@@ -126,13 +130,64 @@ function mostrarMensajeBoton(boton, texto, tiempo = 2000) {
         setTimeout(() => tooltip.remove(), 300);
     }, tiempo);
 }
-tallas.forEach(talla => {
-    const stock = parseInt(talla.getAttribute("data-stock"));
-    if(stock === 0){
-        talla.style.opacity = "0.4";
-        talla.style.pointerEvents = "none";
-        talla.textContent = talla.textContent + " (Agotado)";
-    } else {
-        talla.textContent = talla.textContent + " (" + stock + ")";
+
+function comprarPorWhatsApp() {
+
+    if (carrito.length === 0) {
+        alert("El carrito está vacío");
+        return;
     }
+
+    const nombre = document.getElementById("cliente-nombre").value;
+    const telefono = document.getElementById("cliente-telefono").value;
+    const direccion = document.getElementById("cliente-direccion").value;
+    const pago = document.getElementById("cliente-pago").value;
+
+    if(!nombre || !telefono || !direccion || !pago){
+        alert("Por favor complete sus datos");
+        return;
+    }
+
+    let numero = "59175697356"; // tu número
+
+    let mensaje = "🛒 *NUEVO PEDIDO*\n\n";
+
+    mensaje += "👥 Cliente: " + nombre + "\n";
+    mensaje += "📲 Teléfono: " + telefono + "\n";
+    mensaje += "📍 Dirección: " + direccion + "\n";
+    mensaje += "💳 Pago: " + pago + "\n\n";
+
+    mensaje += "🛍️ *Productos*\n\n";
+
+    carrito.forEach(item => {
+        mensaje += "• " + item.nombre + "\n";
+        mensaje += "Talla: " + item.talla + "\n";
+        mensaje += "Cantidad: " + item.cantidad + "\n";
+        mensaje += "Subtotal: Bs. " + (item.precio * item.cantidad) + "\n\n";
+    });
+
+    let total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+
+    mensaje += "💰 *TOTAL: Bs. " + total + "*";
+
+    const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensaje);
+	if(confirm("¿Deseas enviar este pedido por WhatsApp?")){
+
+    window.open(url, "_blank");
+    carrito = [];
+    localStorage.removeItem("carrito");
+    actualizarCarrito();
+}
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    actualizarCarrito();
+
+    const botonWhatsapp = document.getElementById("btn-whatsapp");
+
+    if(botonWhatsapp){
+        botonWhatsapp.addEventListener("click", comprarPorWhatsApp);
+    }
+
 });
