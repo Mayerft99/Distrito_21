@@ -1,3 +1,13 @@
+html, body{
+height:100%;
+}
+
+body{
+display:flex;
+flex-direction:column;
+min-height:100vh;
+}
+
 
 * {
     margin: 0;
@@ -67,6 +77,7 @@ header:hover .menu-superior {
 }
 
 .contenedor {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -581,6 +592,41 @@ header:hover .menu-superior {
     font-size: 1.1rem;
 }
 
+/* PRESENTACION */
+
+.presentacion{
+text-align:center;
+margin:80px auto;
+max-width:700px;
+}
+
+.titulo-presentacion{
+font-size:60px;
+color:white;
+margin-bottom:20px;
+}
+
+.texto-presentacion{
+color:white;
+font-size:18px;
+margin-bottom:30px;
+}
+
+.boton-presentacion{
+display:inline-block;
+padding:12px 30px;
+background:white;
+color:black;
+text-decoration:none;
+border-radius:8px;
+font-weight:bold;
+transition:0.3s;
+}
+
+.boton-presentacion:hover{
+background:#e5e5e5;
+}
+
 /* GRID DE CATEGORÍAS */
 .grid-categorias {
     display: grid;
@@ -667,7 +713,7 @@ header {
         width: 100%;
         z-index: 1000;
         margin-top: 0 !important;
-        transform: translateY(-110%); /* Escondido */
+        transform: translateY(-110%); 
         transition: transform 0.4s ease;
         display: flex;
         justify-content: center;
@@ -676,22 +722,58 @@ header {
     header.header-visible {
         transform: translateY(0);
     }
+    
 
-    /* MENÚ COMPACTO: Aquí arreglamos que no sea gigante */
+    /* MENÚ COMPACTO */
     .menu-superior {
         width: 90% !important;
-        flex-wrap: wrap; /* Permite 2 filas si es necesario */
+        flex-wrap: wrap; 
         padding: 10px 15px !important;
         gap: 10px !important;
         border-radius: 20px !important;
-        opacity: 1 !important; /* Forzamos visibilidad */
+        opacity: 1 !important; 
         visibility: visible !important;
         justify-content: center;
     }
 
     .menu-superior a {
-        font-size: 0.9rem; /* Letra más pequeña para que quepa */
+        font-size: 0.9rem; 
         padding: 5px 10px !important;
     }
+
+    .menu-desplegable{
+        position:relative;
+        display:inline-block;
+    }
+    
+    .contenido-desplegable{
+        position:absolute;
+        bottom:100%;   /* hace que el menú salga hacia arriba */
+        left:50%;
+        transform:translateX(-50%) translateY(45px);
+
+        background:rgba(0, 0, 0, 0.952);
+        border-radius:20px;
+        padding: 8px;
+
+
+        
+        
+        justify-items:center;
+        width:max-content;
+        
+        z-index:10;
+    }
+    
+
+
+
 }
 
+footer{
+    background:black;
+    color:white;
+    text-align:center;
+    padding:25px;
+    margin-top:60px;
+}

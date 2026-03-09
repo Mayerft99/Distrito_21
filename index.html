@@ -12,10 +12,12 @@
 <header>
     <nav class="menu-superior">
         <a href="index.html">Inicio</a>
-        <a href="#">Acerca de</a>
-        
+
         <a href="https://wa.me/75697356" target="_blank" rel="noopener noreferrer">Contacto</a>
     </nav>
+        <div id="abrir-carrito" class="carrito-icono">
+        🛒 <span id="contador-carrito">0</span>
+        </div>  
 </header>
 
 <div class="contenedor">
@@ -26,6 +28,10 @@
 
     <div class="bloque-titulo">
     <h1 class="titulo-principal">Bienvenido a Distrito 21</h1>
+    <p class="texto-presentacion">
+        Moda urbana auténtica para quienes buscan destacar con estilo propio.<br>
+        Tienda virtual con envíos a toda Bolivia.
+</p>
     <p class="subtitulo">Explora nuestras categorías principales</p>
     </div>
 
@@ -75,6 +81,35 @@ document.addEventListener("DOMContentLoaded", function() {
     document.body.style.backgroundAttachment = "fixed";
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+    let lastScrollTop = 0;
+    const header = document.querySelector('header');
+
+    window.addEventListener('scroll', function() {
+        if (window.innerWidth <= 768) {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            // Si subes el dedo (scroll arriba), muestra. Si bajas, oculta.
+            if (scrollTop < lastScrollTop) {
+                header.classList.add('header-visible');
+            } else {
+                header.classList.remove('header-visible');
+            }
+            
+            // Si llegas arriba de todo, lo ocultamos para ver el título principal
+            if (scrollTop <= 20) {
+                header.classList.remove('header-visible');
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }
+    }, { passive: true });
+});
+
 </script>
+<script src="../js/carrito.js"></script>
+<div id="mensaje-carrito" class="mensaje-carrito"></div>
+<footer>
+    <p>© 2026 Distrito 21 - Todos los derechos reservados</p>
+</footer>
 </body>
 </html>
