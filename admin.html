@@ -1200,24 +1200,35 @@ async function sbFetch(endpoint, options = {}) {
   }
 
   const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+  const method = options.method || 'GET';
+
   const headers = {
     'apikey': SUPABASE_KEY,
     'Authorization': `Bearer ${SUPABASE_KEY}`,
     'Content-Type': 'application/json',
-    'Prefer': 'return=representation',
+    // Para POST/PATCH pedimos que devuelva la fila creada/modificada
+    ...(method !== 'GET' && method !== 'DELETE' ? { 'Prefer': 'return=representation' } : {}),
     ...options.headers
   };
 
   try {
     const res = await fetch(url, { ...options, headers });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || `Error ${res.status}`);
-    }
+
+    // DELETE exitoso devuelve 204 sin cuerpo — lo tratamos como éxito
+    if (res.status === 204) return true;
+
     const text = await res.text();
-    return text ? JSON.parse(text) : [];
+
+    if (!res.ok) {
+      let msg = `Error ${res.status}`;
+      try { msg = JSON.parse(text).message || msg; } catch {}
+      throw new Error(msg);
+    }
+
+    return text ? JSON.parse(text) : true;
   } catch (e) {
     showToast(`Error: ${e.message}`, 'error');
+    console.error('sbFetch error:', e);
     return null;
   }
 }
@@ -1384,13 +1395,14 @@ async function deleteCategory(id) {
 // ══════════════════════════════════════════════
 async function loadProducts() {
   document.getElementById('products-loading').style.display = 'flex';
+  // Admin ve TODOS los productos sin importar si están activos o no
   const data = await sbFetch('productos?select=*,categorias(nombre,icono)&order=created_at.desc');
   document.getElementById('products-loading').style.display = 'none';
-  if (!data) return;
-  allProducts = data;
-  renderProducts(data);
-  document.getElementById('stat-productos').textContent = data.length;
-  document.getElementById('stat-activos').textContent = data.filter(p => p.activo).length;
+  if (data === null) return;
+  allProducts = Array.isArray(data) ? data : [];
+  renderProducts(allProducts);
+  document.getElementById('stat-productos').textContent = allProducts.length;
+  document.getElementById('stat-activos').textContent = allProducts.filter(p => p.activo).length;
 
   // Recent products in dashboard
   const recent = data.slice(0, 4);
@@ -1561,9 +1573,10 @@ async function saveProduct() {
   btn.innerHTML = '💾 Guardar Producto';
 
   if (res !== null) {
-    showToast(id ? 'Producto actualizado' : 'Producto creado ✅', 'success');
+    showToast(id ? 'Producto actualizado ✅' : 'Producto creado ✅', 'success');
     closeModal('modal-producto');
-    loadProducts();
+    // Pequeño delay para que Supabase indexe antes de recargar
+    setTimeout(() => loadProducts(), 400);
   }
 }
 
