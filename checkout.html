@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Distrito 21</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ── CHECKOUT ESPECÍFICO ── */
+  .checkout-wrapper {
+    max-width: 680px;
+    margin: 40px auto;
+    padding: 0 20px 60px;
+  }
+
+  .checkout-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 20px;
+    color: white;
+  }
+
+  .checkout-card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .step-badge {
+    background: #25D366;
+    color: white;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  /* Resumen de pedido */
+  .resumen-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px;
+  }
+
+  .resumen-item:last-child { border-bottom: none; }
+
+  .resumen-nombre { flex: 1; }
+  .resumen-talla  { color: rgba(255,255,255,0.6); margin: 0 12px; font-size: 12px; }
+  .resumen-precio { font-weight: bold; color: #27ae60; white-space: nowrap; }
+
+  .resumen-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px solid rgba(255,255,255,0.2);
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+
+  .resumen-total span:last-child { color: #27ae60; }
+
+  /* QR */
+  .qr-container {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .qr-container img {
+    width: 220px;
+    height: 220px;
+    border-radius: 12px;
+    border: 4px solid white;
+    background: white;
+    padding: 8px;
+  }
+
+  .qr-placeholder {
+    width: 220px;
+    height: 220px;
+    border-radius: 12px;
+    border: 3px dashed rgba(255,255,255,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    gap: 8px;
+  }
+
+  .qr-placeholder span { font-size: 40px; }
+
+  .qr-info {
+    margin-top: 16px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.6;
+  }
+
+  .qr-info strong { color: white; }
+
+  .cuenta-info {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .cuenta-info .label {
+    color: rgba(255,255,255,0.6);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .cuenta-info .valor {
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+  }
+
+  /* Upload comprobante */
+  .upload-zone {
+    border: 2px dashed rgba(255,255,255,0.3);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: #25D366;
+    background: rgba(37,211,102,0.05);
+  }
+
+  .upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .upload-zone .upload-icon { font-size: 36px; margin-bottom: 8px; }
+  .upload-zone p { font-size: 13px; color: rgba(255,255,255,0.7); }
+  .upload-zone .hint { font-size: 11px; margin-top: 4px; color: rgba(255,255,255,0.4); }
+
+  .preview-comprobante {
+    margin-top: 14px;
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .preview-comprobante img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  /* Botón confirmar */
+  .btn-confirmar {
+    width: 100%;
+    padding: 16px;
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .btn-confirmar:hover:not(:disabled) { background: #1ebe5d; transform: translateY(-1px); }
+  .btn-confirmar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .btn-volver {
+    display: block;
+    text-align: center;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    margin-top: 16px;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* Estados */
+  .estado-exito {
+    text-align: center;
+    padding: 40px 20px;
+    display: none;
+  }
+
+  .estado-exito .icono { font-size: 64px; margin-bottom: 16px; }
+  .estado-exito h2 { font-size: 1.5rem; margin-bottom: 10px; }
+  .estado-exito p { color: rgba(255,255,255,0.7); font-size: 14px; line-height: 1.6; }
+
+  .spinner-inline {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Método de pago seleccionado */
+  .metodo-badge {
+    display: inline-block;
+    background: rgba(37,211,102,0.15);
+    border: 1px solid rgba(37,211,102,0.4);
+    color: #25D366;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+  }
+
+  .datos-cliente {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.8;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  /* ── TABS DE PAGO ── */
+  .tab-pago {
+    flex: 1;
+    padding: 10px 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .tab-pago:hover { background: rgba(255,255,255,0.12); color: white; }
+
+  .tab-pago.activo {
+    background: rgba(37,211,102,0.15);
+    border-color: rgba(37,211,102,0.5);
+    color: #25D366;
+  }
+
+  /* ── MONTO DESTACADO ── */
+  .monto-destacado {
+    text-align: center;
+    font-size: 2.4rem;
+    font-weight: bold;
+    color: #27ae60;
+    background: rgba(39,174,96,0.1);
+    border: 2px solid rgba(39,174,96,0.3);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin: 16px 0;
+    letter-spacing: -0.5px;
+  }
+
+  /* ── BOTÓN COPIAR ── */
+  .btn-copiar {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    color: white;
+    font-size: 11px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .btn-copiar:hover { background: rgba(255,255,255,0.2); }
+  .btn-copiar.copiado { background: rgba(37,211,102,0.3); border-color: #25D366; color: #25D366; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="menu-superior">
+    <a href="index.html">Inicio</a>
+    <a href="https://wa.me/75697356" target="_blank" rel="noopener noreferrer">Contacto</a>
+  </nav>
+</header>
+
+<div class="bloque-tituloseccion" style="margin-top:20px">
+  <h1 class="titulo-principalseccion" style="font-size:1.8rem">Finalizar Pedido</h1>
+</div>
+
+<div class="checkout-wrapper">
+
+  <!-- ══ ÉXITO ══ -->
+  <div class="checkout-card estado-exito" id="estado-exito">
+    <div class="icono">🎉</div>
+    <h2>¡Pedido registrado!</h2>
+    <p>Recibimos tu pedido correctamente.<br>
+    Te contactaremos por WhatsApp para confirmar el pago y coordinar la entrega.</p>
+    <br>
+    <button class="btn-confirmar" style="margin-top:0" onclick="window.location.href='index.html'">
+      Volver al inicio
+    </button>
+  </div>
+
+  <!-- ══ PASO 1: Resumen ══ -->
+  <div class="checkout-card" id="paso-resumen">
+    <h2><span class="step-badge">1</span> Tu pedido</h2>
+    <div id="resumen-items"></div>
+    <div class="resumen-total">
+      <span>Total a pagar</span>
+      <span id="resumen-total">Bs. 0</span>
+    </div>
+    <div style="margin-top:16px; font-size:13px; color:rgba(255,255,255,0.7)">
+      <strong style="color:white">Cliente:</strong>
+      <div class="datos-cliente" id="datos-cliente" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- ══ PASO 2: Pago QR ══ -->
+  <div class="checkout-card" id="paso-pago">
+    <h2>
+      <span class="step-badge">2</span>
+      Elige cómo pagar
+    </h2>
+
+    <!-- Tabs de método de pago -->
+    <div style="display:flex; gap:10px; margin-bottom:24px;" id="tabs-pago">
+      <button class="tab-pago activo" onclick="mostrarTab('qr')" id="tab-qr">
+        📱 QR Económico
+      </button>
+      <button class="tab-pago" onclick="mostrarTab('transferencia')" id="tab-transferencia">
+        🏦 Transferencia
+      </button>
+      <button class="tab-pago" onclick="mostrarTab('efectivo')" id="tab-efectivo">
+        💵 Efectivo
+      </button>
+    </div>
+
+    <!-- ── TAB QR ── -->
+    <div id="seccion-qr">
+      <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:16px; line-height:1.6">
+        Escanea el QR con la app de tu banco. El QR ya tiene el motivo <strong>"Distrito 21"</strong> — solo ingresa el monto exacto que se muestra abajo.
+      </p>
+
+      <div class="qr-container">
+        <img src="media/qr_economico_d21.jpeg" alt="QR Banco Económico - Distrito 21">
+      </div>
+
+      <div class="monto-destacado" id="monto-qr">Bs. 0</div>
+      <p style="text-align:center; font-size:12px; color:rgba(255,255,255,0.5); margin-top:6px">
+        Ingresa este monto exacto al escanear el QR
+      </p>
+
+      <div class="cuenta-info" style="margin-top:18px">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <div>
+            <div class="label">Banco</div>
+            <div class="valor">Banco Económico</div>
+          </div>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Banco_Economico_logo.svg/200px-Banco_Economico_logo.svg.png"
+               alt="Banco Económico" style="height:28px; opacity:0.85"
+               onerror="this.style.display='none'">
+        </div>
+        <div style="margin-top:10px">
+          <div class="label">Titular</div>
+          <div class="valor">ANDRADE BARRON CARLOS BENAIAS</div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="label">Número de cuenta</div>
+          <div class="valor" style="display:flex; align-items:center; gap:10px">
+            CA-1001754129
+            <button onclick="copiarTexto('1001754129', this)" class="btn-copiar">📋 Copiar</button>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="label">Tipo de cuenta</div>
+          <div class="valor">Caja de Ahorros en Bolivianos</div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="label">Motivo / Referencia</div>
+          <div class="valor">Distrito 21</div>
+        </div>
+      </div>
+
+      <div class="qr-info" style="margin-top:16px">
+        ① Abre la app de tu banco y busca <strong>Pagar con QR</strong><br>
+        ② Escanea el código de arriba<br>
+        ③ Ingresa el monto exacto: <strong id="monto-instruccion">Bs. 0</strong><br>
+        ④ Sube la foto del comprobante en el paso 3
+      </div>
+    </div>
+
+    <!-- ── TAB TRANSFERENCIA ── -->
+    <div id="seccion-transferencia" style="display:none">
+      <p style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:16px; line-height:1.6">
+        Realiza una transferencia bancaria desde cualquier banco boliviano a esta cuenta:
+      </p>
+
+      <div class="monto-destacado" id="monto-transferencia">Bs. 0</div>
+      <p style="text-align:center; font-size:12px; color:rgba(255,255,255,0.5); margin-top:6px">
+        Transfiere este monto exacto
+      </p>
+
+      <div class="cuenta-info" style="margin-top:18px">
+        <div>
+          <div class="label">Banco destino</div>
+          <div class="valor">Banco Económico</div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="label">Titular</div>
+          <div class="valor">ANDRADE BARRON CARLOS BENAIAS</div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="label">Número de cuenta</div>
+          <div class="valor" style="display:flex; align-items:center; gap:10px">
+            1001754129
+            <button onclick="copiarTexto('1001754129', this)" class="btn-copiar">📋 Copiar</button>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="label">Tipo de cuenta</div>
+          <div class="valor">Caja de Ahorros — Bolivianos (BOB)</div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="label">CI del titular</div>
+          <div class="valor">Proporcionado al confirmar por WhatsApp</div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="label">Referencia / Motivo</div>
+          <div class="valor" style="display:flex; align-items:center; gap:10px">
+            Distrito 21
+            <button onclick="copiarTexto('Distrito 21', this)" class="btn-copiar">📋 Copiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="qr-info" style="margin-top:16px">
+        ① Entra a la app de tu banco → Transferencias<br>
+        ② Ingresa el número de cuenta y el banco destino<br>
+        ③ El monto debe ser <strong id="monto-instruccion-t">Bs. 0</strong> exacto<br>
+        ④ Guarda el comprobante y súbelo abajo
+      </div>
+    </div>
+
+    <!-- ── TAB EFECTIVO ── -->
+    <div id="seccion-efectivo" style="display:none">
+      <div style="text-align:center; padding:20px 0">
+        <div style="font-size:56px; margin-bottom:16px">💵</div>
+        <p style="font-size:15px; color:white; font-weight:bold; margin-bottom:8px">Pago contra entrega</p>
+        <p style="font-size:13px; color:rgba(255,255,255,0.7); line-height:1.7">
+          Pagarás en efectivo cuando recibas tu pedido.<br>
+          Ten listo el monto exacto:
+        </p>
+        <div class="monto-destacado" id="monto-efectivo" style="margin:16px auto">Bs. 0</div>
+        <p style="font-size:12px; color:rgba(255,255,255,0.5)">
+          Solo disponible para entregas en Santa Cruz de la Sierra
+        </p>
+      </div>
+
+      <div class="qr-info">
+        ① Confirma tu pedido con el botón de abajo<br>
+        ② Te contactaremos por WhatsApp para coordinar la entrega<br>
+        ③ Paga al recibir tu pedido en efectivo
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PASO 3: Comprobante ══ -->
+  <div class="checkout-card" id="paso-comprobante">
+    <h2><span class="step-badge">3</span> Sube tu comprobante</h2>
+
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="input-comprobante" accept="image/*" onchange="previsualizarComprobante(event)">
+      <div class="upload-icon">📸</div>
+      <p>Toca aquí para subir la foto del comprobante</p>
+      <p class="hint">JPG, PNG — máx. 5MB</p>
+    </div>
+
+    <div class="preview-comprobante" id="preview-comprobante">
+      <img id="img-comprobante-preview" src="" alt="Comprobante">
+    </div>
+
+    <button class="btn-confirmar" id="btn-confirmar" onclick="confirmarPedido()" disabled>
+      Confirmar pedido →
+    </button>
+
+    <span class="btn-volver" onclick="window.history.back()">← Volver y editar carrito</span>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://qhpyclwnddylziambbsj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocHljbHduZGR5bHppYW1iYnNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMzI1NzAsImV4cCI6MjA4OTgwODU3MH0._JEYSQcOhg9TFhhVR_O6lYwMXhUFxj5Osx4PEFPKsQ0';
+
+let carrito  = [];
+let cliente  = {};
+let comprobanteFile = null;
+let tabActual = 'qr';
+
+// ── Fondo ──
+document.addEventListener("DOMContentLoaded", function () {
+  const imgs = ["media/fondo1.jpg","media/fondo2.jpg","media/fondo3.jpg","media/fondo4.jpg"];
+  const img  = imgs[Math.floor(Math.random() * imgs.length)];
+  document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),url(${img})`;
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundPosition = "center";
+  document.body.style.backgroundAttachment = "fixed";
+  cargarDatos();
+});
+
+function cargarDatos() {
+  carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+  cliente = JSON.parse(localStorage.getItem("checkout_cliente")) || {};
+
+  if (!carrito.length || !cliente.nombre) {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  let total = 0;
+  const resumenItems = document.getElementById("resumen-items");
+
+  resumenItems.innerHTML = carrito.map(item => {
+    const subtotal = item.precio * item.cantidad;
+    total += subtotal;
+    return `
+      <div class="resumen-item">
+        <span class="resumen-nombre">${item.nombre} x${item.cantidad}</span>
+        ${item.talla ? `<span class="resumen-talla">Talla: ${item.talla}</span>` : ''}
+        <span class="resumen-precio">Bs. ${subtotal}</span>
+      </div>`;
+  }).join('');
+
+  document.getElementById("resumen-total").textContent = `Bs. ${total}`;
+
+  // Actualizar todos los montos
+  ['monto-qr','monto-transferencia','monto-efectivo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `Bs. ${total}`;
+  });
+  ['monto-instruccion','monto-instruccion-t'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `Bs. ${total}`;
+  });
+
+  // Datos del cliente
+  document.getElementById("datos-cliente").innerHTML = `
+    👤 ${cliente.nombre}<br>
+    📱 ${cliente.telefono}<br>
+    📍 ${cliente.direccion}<br>
+    💳 ${cliente.pago}`;
+
+  // Si el cliente eligió efectivo, abrir ese tab directo
+  if (cliente.pago === 'Efectivo') {
+    mostrarTab('efectivo');
+    document.getElementById("btn-confirmar").disabled = false;
+  }
+}
+
+// ── Tabs de método de pago ──
+function mostrarTab(tab) {
+  tabActual = tab;
+  const secciones = ['qr','transferencia','efectivo'];
+  secciones.forEach(s => {
+    document.getElementById(`seccion-${s}`).style.display  = s === tab ? 'block' : 'none';
+    document.getElementById(`tab-${s}`).classList.toggle('activo', s === tab);
+  });
+
+  // Efectivo no necesita comprobante
+  if (tab === 'efectivo') {
+    document.getElementById("btn-confirmar").disabled = false;
+    document.getElementById("upload-zone").style.opacity = '0.4';
+    document.getElementById("upload-zone").style.pointerEvents = 'none';
+    document.querySelector('.checkout-card:last-of-type h2').innerHTML =
+      '<span class="step-badge">3</span> Confirmar pedido <span style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:normal">(sin comprobante para efectivo)</span>';
+  } else {
+    document.getElementById("upload-zone").style.opacity = '1';
+    document.getElementById("upload-zone").style.pointerEvents = 'auto';
+    // Solo habilitar si ya hay comprobante
+    if (!comprobanteFile) document.getElementById("btn-confirmar").disabled = true;
+    document.querySelector('.checkout-card:last-of-type h2').innerHTML =
+      '<span class="step-badge">3</span> Sube tu comprobante';
+  }
+}
+
+// ── Copiar al portapapeles ──
+function copiarTexto(texto, btn) {
+  navigator.clipboard.writeText(texto).then(() => {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copiado');
+    setTimeout(() => {
+      btn.textContent = '📋 Copiar';
+      btn.classList.remove('copiado');
+    }, 2000);
+  });
+}
+
+// ── Preview comprobante ──
+function previsualizarComprobante(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  comprobanteFile = file;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const preview = document.getElementById("preview-comprobante");
+    document.getElementById("img-comprobante-preview").src = ev.target.result;
+    preview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+  document.getElementById("btn-confirmar").disabled = false;
+}
+
+// ── Confirmar pedido ──
+async function confirmarPedido() {
+  const btn = document.getElementById("btn-confirmar");
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner-inline"></div> Procesando...';
+
+  try {
+    let comprobanteUrl = null;
+
+    // Subir comprobante si hay (no para efectivo)
+    if (comprobanteFile) {
+      const ext  = comprobanteFile.name.split('.').pop();
+      const name = `comprobante_${Date.now()}.${ext}`;
+      const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/comprobantes/${name}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': comprobanteFile.type,
+          'x-upsert': 'true'
+        },
+        body: comprobanteFile
+      });
+      if (uploadRes.ok) {
+        comprobanteUrl = `${SUPABASE_URL}/storage/v1/object/public/comprobantes/${name}`;
+      }
+    }
+
+    const total   = carrito.reduce((s, i) => s + (i.precio * i.cantidad), 0);
+    const detalle = carrito.map(i =>
+      `${i.nombre}${i.talla ? ' talla ' + i.talla : ''} x${i.cantidad} = Bs.${i.precio * i.cantidad}`
+    ).join('\n');
+
+    const metodoPago = tabActual === 'qr' ? 'QR Banco Económico'
+                     : tabActual === 'transferencia' ? 'Transferencia Banco Económico'
+                     : 'Efectivo contra entrega';
+
+    // Registrar pedido en Supabase
+    const pedidoRes = await fetch(`${SUPABASE_URL}/rest/v1/pedidos`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({
+        cliente:           cliente.nombre,
+        telefono:          cliente.telefono,
+        direccion:         cliente.direccion,
+        productos_detalle: detalle,
+        total:             total,
+        estado:            'pendiente',
+        notas: `Método: ${metodoPago}${comprobanteUrl ? ' | Comprobante: ' + comprobanteUrl : ''}`
+      })
+    });
+
+    if (!pedidoRes.ok) throw new Error('Error registrando pedido');
+    const [pedido] = await pedidoRes.json();
+
+    // Descontar stock
+    await descontarStock();
+
+    // WhatsApp
+    enviarWhatsApp(pedido?.id || '—', total, detalle, metodoPago, comprobanteUrl);
+
+    // Limpiar
+    localStorage.removeItem("carrito");
+    localStorage.removeItem("checkout_cliente");
+
+    // Éxito
+    document.getElementById("paso-resumen").style.display     = 'none';
+    document.getElementById("paso-pago").style.display        = 'none';
+    document.getElementById("paso-comprobante").style.display = 'none';
+    document.getElementById("estado-exito").style.display     = 'block';
+
+  } catch (e) {
+    console.error(e);
+    alert("Hubo un error al procesar el pedido. Por favor intenta de nuevo.");
+    btn.disabled = false;
+    btn.innerHTML = 'Confirmar pedido →';
+  }
+}
+
+// ── Descontar stock ──
+async function descontarStock() {
+  for (const item of carrito) {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/productos?nombre=eq.${encodeURIComponent(item.nombre)}&select=id,stock`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+      );
+      const productos = await res.json();
+      if (!productos.length) continue;
+      const prod = productos[0];
+      await fetch(`${SUPABASE_URL}/rest/v1/productos?id=eq.${prod.id}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ stock: Math.max(0, (prod.stock || 0) - item.cantidad) })
+      });
+    } catch (e) { console.error('Stock error:', item.nombre, e); }
+  }
+}
+
+// ── WhatsApp ──
+function enviarWhatsApp(pedidoId, total, detalle, metodoPago, comprobanteUrl) {
+  const num = "59175697356";
+  let msg = `🛒 *NUEVO PEDIDO #${pedidoId}*\n\n`;
+  msg += `👤 ${cliente.nombre}\n`;
+  msg += `📱 ${cliente.telefono}\n`;
+  msg += `📍 ${cliente.direccion}\n`;
+  msg += `💳 ${metodoPago}\n\n`;
+  msg += `🛍️ *Productos:*\n${detalle}\n\n`;
+  msg += `💰 *TOTAL: Bs. ${total}*`;
+  if (comprobanteUrl) msg += `\n\n📎 Comprobante adjunto`;
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+</script>
+
+<div id="mensaje-carrito" class="mensaje-carrito"></div>
+</body>
+</html>
