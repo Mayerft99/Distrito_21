@@ -332,6 +332,39 @@ document.querySelectorAll(".producto-card").forEach(card => {
 
 });
 
+	const SUPABASE_URL = 'https://qhpyclwnddylziambbsj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocHljbHduZGR5bHppYW1iYnNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMzI1NzAsImV4cCI6MjA4OTgwODU3MH0._JEYSQcOhg9TFhhVR_O6lYwMXhUFxj5Osx4PEFPKsQ0';
+
+async function cargarProductos(categoriaSlug) {
+  // Primero obtener el ID de la categoría
+  const catRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/categorias?slug=eq.${categoriaSlug}&select=id`,
+    { headers: { 'apikey': SUPABASE_KEY } }
+  );
+  const cats = await catRes.json();
+  if (!cats.length) return;
+
+  // Luego cargar productos de esa categoría
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/productos?categoria_id=eq.${cats[0].id}&activo=eq.true&select=*`,
+    { headers: { 'apikey': SUPABASE_KEY } }
+  );
+  const productos = await res.json();
+
+  const grid = document.getElementById('grid-productos');
+  grid.innerHTML = productos.map(p => `
+    <div class="producto-card" onclick="agregarAlCarrito(${p.id}, '${p.nombre}', ${p.precio})">
+      <img src="${p.imagen_url || '../media/placeholder.png'}" alt="${p.nombre}">
+      <h3>${p.nombre}</h3>
+      <p>Bs. ${p.precio}</p>
+      ${p.tallas ? `<p class="tallas">${p.tallas}</p>` : ''}
+    </div>
+  `).join('');
+}
+
+// Llamar con el slug de la categoría actual
+cargarProductos('poleras'); // cambiar por: pantalones, zapatos, accesorios
+
 </script>
 
 
