@@ -35,9 +35,9 @@
     </aside>
 
     <main class="contenido">
-        <!-- productos-grid igual que en el original -->
         <div class="productos-grid" id="grid-productos">
-            <p style="color:#ddd; padding:20px;">Cargando productos...</p>
+            <!-- Los productos se cargan aquí desde Supabase -->
+            <p style="color:#aaa; padding:20px;">Cargando productos...</p>
         </div>
     </main>
 
@@ -58,29 +58,24 @@
 
             <input type="text" id="cliente-nombre" placeholder="Nombre completo">
             <input type="text" id="cliente-telefono" placeholder="Teléfono / WhatsApp">
-
-            <!-- Dirección -->
             <input type="text" id="cliente-direccion" placeholder="Dirección de entrega (ej: Av. Banzer km 5)">
 
-            <!-- Separador -->
             <div style="display:flex; align-items:center; gap:8px; margin: 2px 0;">
                 <div style="flex:1; height:1px; background:rgba(255,255,255,0.15)"></div>
                 <span style="font-size:11px; color:rgba(255,255,255,0.4)">o pega tu ubicación</span>
                 <div style="flex:1; height:1px; background:rgba(255,255,255,0.15)"></div>
             </div>
 
-            <!-- Google Maps link -->
             <div style="position:relative">
                 <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none">📍</span>
                 <input type="url" id="cliente-maps"
                     placeholder="Link de Google Maps"
                     style="padding-left:34px">
             </div>
-            <p style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:-4px; padding: 0 4px; line-height:1.4">
+            <p style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:-4px; padding:0 4px; line-height:1.4">
                 Abre Google Maps → comparte tu ubicación → copia el link y pégalo aquí
             </p>
 
-            <!-- Método de pago: solo QR y Efectivo -->
             <select id="cliente-pago">
                 <option value="">Método de pago</option>
                 <option value="QR">📱 QR Banco Económico</option>
@@ -95,8 +90,148 @@
 </div>
 
 
+<script>
+// ── Fondo aleatorio ──
+document.addEventListener("DOMContentLoaded", function() {
+    const imagenes = ["../media/fondo1.jpg","../media/fondo2.jpg","../media/fondo3.jpg","../media/fondo4.jpg"];
+    const img = imagenes[Math.floor(Math.random() * imagenes.length)];
+    document.body.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url(${img})`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
+    document.body.style.backgroundAttachment = "fixed";
+});
+
+// ── Header scroll en móvil ──
+document.addEventListener("DOMContentLoaded", function() {
+    let lastScrollTop = 0;
+    const header = document.querySelector('header');
+    window.addEventListener('scroll', function() {
+        if (window.innerWidth <= 768) {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop < lastScrollTop) header.classList.add('header-visible');
+            else header.classList.remove('header-visible');
+            if (scrollTop <= 20) header.classList.remove('header-visible');
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }
+    }, { passive: true });
+});
+
+// ── Supabase config ──
+const SUPABASE_URL = 'https://qhpyclwnddylziambbsj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocHljbHduZGR5bHppYW1iYnNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMzI1NzAsImV4cCI6MjA4OTgwODU3MH0._JEYSQcOhg9TFhhVR_O6lYwMXhUFxj5Osx4PEFPKsQ0';
+
+// ── Cargar productos desde Supabase ──
+async function cargarProductos() {
+    const grid = document.getElementById('grid-productos');
+
+    try {
+        // 1. Obtener ID de la categoría "poleras"
+        const catRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/categorias?slug=eq.poleras&select=id`,
+            { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+        );
+        const cats = await catRes.json();
+
+        if (!cats.length) {
+            grid.innerHTML = '<p style="color:#aaa;padding:20px;">No se encontró la categoría.</p>';
+            return;
+        }
+
+        // 2. Obtener productos activos de esa categoría
+        const prodRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/productos?categoria_id=eq.${cats[0].id}&activo=eq.true&select=*&order=created_at.desc`,
+            { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+        );
+        const productos = await prodRes.json();
+
+        if (!productos.length) {
+            grid.innerHTML = '<p style="color:#aaa;padding:20px;">No hay productos disponibles por el momento.</p>';
+            return;
+        }
+
+        // 3. Renderizar con el mismo HTML que usabas antes
+        grid.innerHTML = productos.map(p => {
+            // Parsear tallas: "S, M, L, XL" → array
+            const tallas = p.tallas ? p.tallas.split(',').map(t => t.trim()) : [];
+
+            const tallasHTML = tallas.length ? `
+                <div class="menu-desplegable">
+                    <button class="boton-desplegable">Seleccionar Talla</button>
+                    <div class="contenido-desplegable">
+                        ${tallas.map(t => `<a href="#" data-talla="${t}">${t}</a>`).join('')}
+                    </div>
+                </div>
+            ` : '';
+
+            return `
+                <section class="producto-card" data-id="${p.id}" data-nombre="${p.nombre}" data-precio="${p.precio}">
+                    <div class="imagen-contenedor">
+                        <img src="${p.imagen_url || '../media/placeholder.png'}" alt="${p.nombre}">
+                    </div>
+                    <div class="info-producto">
+                        <h2>${p.nombre}</h2>
+                        ${p.descripcion ? `<p class="descripcion">${p.descripcion}</p>` : ''}
+                        <p class="precio">Bs. ${p.precio}</p>
+                        ${tallasHTML}
+                        <button class="boton-comprar">🛒 Agregar Al Carrito</button>
+                    </div>
+                </section>
+            `;
+        }).join('');
+
+        // 4. Activar la lógica de tallas y carrito (igual que antes)
+        activarTarjetas();
+
+    } catch (e) {
+        console.error(e);
+        grid.innerHTML = '<p style="color:#aaa;padding:20px;">Error cargando productos.</p>';
+    }
+}
+
+// ── Lógica de tallas y carrito (igual que el código original) ──
+function activarTarjetas() {
+    document.querySelectorAll(".producto-card").forEach(card => {
+        const botonTalla = card.querySelector(".boton-desplegable");
+        const tallaLinks = card.querySelectorAll(".contenido-desplegable a");
+        const botonComprar = card.querySelector(".boton-comprar");
+        const nombreProducto = card.dataset.nombre;
+        const precio = parseInt(card.dataset.precio);
+        let tallaSeleccionada = null;
+
+        tallaLinks.forEach(talla => {
+            talla.addEventListener("click", function(e) {
+                e.preventDefault();
+                tallaLinks.forEach(t => t.classList.remove("talla-seleccionada"));
+                this.classList.add("talla-seleccionada");
+                tallaSeleccionada = this.dataset.talla;
+                botonTalla.textContent = "Talla: " + tallaSeleccionada;
+            });
+        });
+
+        botonComprar.addEventListener("click", function() {
+            if (tallaLinks.length > 0 && !tallaSeleccionada) {
+                botonComprar.textContent = "⚠ Selecciona una talla";
+                setTimeout(() => { botonComprar.textContent = "🛒 Agregar Al Carrito"; }, 1500);
+                return;
+            }
+
+            agregarAlCarrito({
+                nombre: nombreProducto,
+                precio: precio,
+                talla: tallaSeleccionada || ''
+            });
+
+            botonComprar.textContent = "✓ Agregado";
+            setTimeout(() => { botonComprar.textContent = "🛒 Agregar Al Carrito"; }, 1500);
+        });
+    });
+}
+
+// Iniciar carga
+cargarProductos();
+</script>
+
 <script src="../js/carrito.js"></script>
 <div id="mensaje-carrito" class="mensaje-carrito"></div>
-
 </body>
 </html>
