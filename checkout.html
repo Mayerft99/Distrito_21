@@ -363,9 +363,6 @@
       <button class="tab-pago activo" onclick="mostrarTab('qr')" id="tab-qr">
         📱 QR Económico
       </button>
-      <button class="tab-pago" onclick="mostrarTab('transferencia')" id="tab-transferencia">
-        🏦 Transferencia
-      </button>
       <button class="tab-pago" onclick="mostrarTab('efectivo')" id="tab-efectivo">
         💵 Efectivo
       </button>
@@ -580,10 +577,14 @@ function cargarDatos() {
   });
 
   // Datos del cliente
+  const ubicacion = cliente.mapsLink
+    ? `<a href="${cliente.mapsLink}" target="_blank" style="color:#25D366">📍 Ver en Google Maps</a>${cliente.direccion ? '<br>🏠 ' + cliente.direccion : ''}`
+    : `📍 ${cliente.direccion}`;
+
   document.getElementById("datos-cliente").innerHTML = `
     👤 ${cliente.nombre}<br>
     📱 ${cliente.telefono}<br>
-    📍 ${cliente.direccion}<br>
+    ${ubicacion}<br>
     💳 ${cliente.pago}`;
 
   // Si el cliente eligió efectivo, abrir ese tab directo
@@ -596,7 +597,7 @@ function cargarDatos() {
 // ── Tabs de método de pago ──
 function mostrarTab(tab) {
   tabActual = tab;
-  const secciones = ['qr','transferencia','efectivo'];
+  const secciones = ['qr','efectivo'];
   secciones.forEach(s => {
     document.getElementById(`seccion-${s}`).style.display  = s === tab ? 'block' : 'none';
     document.getElementById(`tab-${s}`).classList.toggle('activo', s === tab);
@@ -760,7 +761,8 @@ function enviarWhatsApp(pedidoId, total, detalle, metodoPago, comprobanteUrl) {
   let msg = `🛒 *NUEVO PEDIDO #${pedidoId}*\n\n`;
   msg += `👤 ${cliente.nombre}\n`;
   msg += `📱 ${cliente.telefono}\n`;
-  msg += `📍 ${cliente.direccion}\n`;
+  if (cliente.direccion) msg += `🏠 ${cliente.direccion}\n`;
+  if (cliente.mapsLink)  msg += `📍 Ubicación: ${cliente.mapsLink}\n`;
   msg += `💳 ${metodoPago}\n\n`;
   msg += `🛍️ *Productos:*\n${detalle}\n\n`;
   msg += `💰 *TOTAL: Bs. ${total}*`;
