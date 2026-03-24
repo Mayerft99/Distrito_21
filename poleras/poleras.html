@@ -118,8 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // ── Supabase config ──
-const SUPABASE_URL = ...
-const SUPABASE_KEY = ...
+fetch(`${SUPABASE_URL}/rest/v1/...`)
 // ── Cargar productos desde Supabase ──
 async function cargarProductos() {
     const grid = document.getElementById('grid-productos');
