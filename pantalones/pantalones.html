@@ -89,7 +89,8 @@
     </div>
 </div>
 
-
+<script src="../js/config.js"></script>
+    
 <script>
 // ── Fondo aleatorio ──
 document.addEventListener("DOMContentLoaded", function() {
@@ -116,10 +117,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }, { passive: true });
 });
 
-// ── Supabase config ──
-const SUPABASE_URL = 'https://qhpyclwnddylziambbsj.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocHljbHduZGR5bHppYW1iYnNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMzI1NzAsImV4cCI6MjA4OTgwODU3MH0._JEYSQcOhg9TFhhVR_O6lYwMXhUFxj5Osx4PEFPKsQ0';
-
+const SUPABASE_URL = ...
+const SUPABASE_KEY = ...
+    
 // ── Cargar productos desde Supabase ──
 async function cargarProductos() {
     const grid = document.getElementById('grid-productos');
