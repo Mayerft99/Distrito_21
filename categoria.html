@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Categoría — DISTRITO 21</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="relative min-h-screen">
+
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+  <div class="bg-orb orb3"></div>
+  <div class="grain"></div>
+
+  <!-- ============ NAV ============ -->
+  <nav class="fixed top-0 left-0 right-0 z-40 px-4 sm:px-8 py-4">
+    <div class="max-w-7xl mx-auto glass rounded-2xl px-5 sm:px-8 py-3.5 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-full border border-[var(--accent)]/50 flex items-center justify-center font-display font-bold text-sm">21</div>
+        <span class="font-display font-bold tracking-tight text-lg sm:text-xl">DISTRITO<span class="text-accent">21</span></span>
+      </a>
+      <div id="navCategorias" class="hidden md:flex items-center gap-7 font-mono text-xs uppercase tracking-widest text-[var(--chalk)]/70"></div>
+      <div class="flex items-center gap-2">
+        <a href="admin.html" class="hidden sm:flex glass rounded-full px-4 py-2.5 text-[11px] font-mono uppercase tracking-widest hover:border-[var(--accent)]/50 transition-colors">Panel</a>
+        <button id="cartBtn" class="relative glass rounded-full w-11 h-11 flex items-center justify-center hover:border-[var(--accent)]/60 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.693 2.442-7.152.078-.383-.22-.738-.611-.738H5.106M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
+          <span id="cartCount" class="absolute -top-1.5 -right-1.5 bg-[var(--accent)] text-[var(--carbon)] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center font-mono">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============ HEADER DE CATEGORIA ============ -->
+  <header class="relative z-10 px-4 sm:px-8 pt-32 pb-10">
+    <div class="max-w-7xl mx-auto">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
+        <a href="index.html" class="hover:underline">Inicio</a> / <span id="crumbCat">Categoría</span>
+      </p>
+      <h1 id="catTitle" class="font-display font-bold text-4xl sm:text-5xl flex items-center gap-3">
+        <span id="catIcon"></span> <span id="catNombre">Categoría</span>
+      </h1>
+      <p id="catCount" class="mt-3 font-mono text-xs text-[var(--chalk)]/45 uppercase tracking-widest"></p>
+    </div>
+  </header>
+
+  <!-- ============ GRID ============ -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 pb-20">
+    <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"></div>
+    <div id="emptyState" class="hidden text-center py-20">
+      <p id="emptyTitle" class="font-display font-bold text-xl mb-2">Esta categoría no tiene productos todavía</p>
+      <p id="emptySubtitle" class="text-[var(--chalk)]/50 text-sm mb-6">Agrega productos desde el Panel de Control.</p>
+      <a href="index.html" class="btn-primary inline-block font-display font-semibold px-7 py-3.5 rounded-full text-sm uppercase tracking-wider">Volver al inicio</a>
+    </div>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="relative z-10 border-t border-white/5 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-10 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <span class="font-display font-bold">DISTRITO<span class="text-accent">21</span></span>
+      <p class="font-mono text-xs text-[var(--chalk)]/40 uppercase tracking-widest">Bolivia · Pedidos por WhatsApp</p>
+    </div>
+  </footer>
+
+  <!-- ============ CART DRAWER ============ -->
+  <div id="cartOverlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none"></div>
+  <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] z-50 translate-x-full glass-strong flex flex-col">
+    <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
+      <h3 class="font-display font-bold text-xl">Tu Carrito</h3>
+      <button id="cartCloseBtn" class="w-9 h-9 rounded-full glass flex items-center justify-center hover:border-[var(--accent)]/50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <div id="cartItems" class="flex-1 overflow-y-auto px-6 py-4 space-y-4"></div>
+    <div class="px-6 py-5 border-t border-white/10 space-y-4">
+      <div class="flex justify-between font-mono text-sm text-[var(--chalk)]/60">
+        <span>Subtotal</span><span id="cartSubtotal">Bs. 0</span>
+      </div>
+      <div class="flex justify-between font-display font-bold text-lg">
+        <span>Total</span><span id="cartTotal" class="text-accent">Bs. 0</span>
+      </div>
+      <button id="whatsappBtn" class="w-full btn-primary font-display font-semibold py-4 rounded-full text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 004.74 1.2h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.95-.3-1.63-.6-2.87-1.24-4.74-4.13-4.88-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.4.74-2.09 1-2.38.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.31-.29.48-.14.17-.3.37-.43.5-.14.14-.29.29-.13.57.17.28.75 1.24 1.61 2 1.11.99 2.04 1.3 2.32 1.44.28.14.44.12.6-.07.17-.19.71-.83.9-1.11.19-.28.38-.24.63-.14.26.1 1.64.77 1.92.91.28.14.47.21.53.33.07.12.07.68-.17 1.36z"/></svg>
+        Finalizar Pedido por WhatsApp
+      </button>
+    </div>
+  </aside>
+
+  <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-24 opacity-0 z-[60] glass-strong rounded-full px-6 py-3 font-mono text-xs uppercase tracking-widest"></div>
+
+  <script src="js/store.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/render.js"></script>
+  <script>
+  (function(){
+    "use strict";
+    function getSlug(){
+      const params = new URLSearchParams(window.location.search);
+      return params.get("cat") || "";
+    }
+
+    function showEmpty(title, subtitle){
+      const grid = document.getElementById("productGrid");
+      const empty = document.getElementById("emptyState");
+      grid.innerHTML = "";
+      document.getElementById("emptyTitle").textContent = title;
+      document.getElementById("emptySubtitle").textContent = subtitle;
+      empty.classList.remove("hidden");
+    }
+
+    async function renderCategoryPage(){
+      const slug = getSlug();
+
+      if (!window.D21Store.isConfigured()){
+        document.getElementById("navCategorias").innerHTML = "";
+        document.getElementById("catNombre").textContent = "Tienda sin conectar";
+        document.getElementById("catIcon").textContent = "⚙️";
+        document.getElementById("crumbCat").textContent = "Configuración pendiente";
+        document.getElementById("catCount").textContent = "";
+        showEmpty("La tienda todavía no está conectada", "Conecta Supabase desde el Panel de Control para ver este catálogo.");
+        return;
+      }
+
+      try {
+        const categorias = await window.D21Store.getCategorias();
+        document.getElementById("navCategorias").innerHTML = categorias.map(c =>
+          `<a href="categoria.html?cat=${encodeURIComponent(c.slug)}" class="hover:text-accent transition-colors">${c.nombre}</a>`
+        ).join("");
+
+        const cat = categorias.find(c => c.slug === slug) || null;
+        const grid = document.getElementById("productGrid");
+        const empty = document.getElementById("emptyState");
+
+        if (!cat){
+          document.getElementById("catNombre").textContent = "Categoría no encontrada";
+          document.getElementById("catIcon").textContent = "🔎";
+          document.getElementById("crumbCat").textContent = "No encontrada";
+          document.getElementById("catCount").textContent = "";
+          showEmpty("Esta categoría ya no existe", "Puede que haya sido eliminada. Vuelve al inicio para ver el catálogo actual.");
+          return;
+        }
+
+        document.title = cat.nombre + " — DISTRITO 21";
+        document.getElementById("catNombre").textContent = cat.nombre;
+        document.getElementById("catIcon").textContent = cat.icono || "🏷️";
+        document.getElementById("crumbCat").textContent = cat.nombre;
+
+        const productos = await window.D21Store.getProductosPorCategoriaSlug(slug);
+        document.getElementById("catCount").textContent = `${productos.length} ${productos.length === 1 ? "producto" : "productos"}`;
+
+        if (productos.length === 0){
+          showEmpty("Esta categoría no tiene productos todavía", "Agrega productos desde el Panel de Control.");
+        } else {
+          empty.classList.add("hidden");
+          grid.innerHTML = productos.map(p => window.D21ProductCard(p, "")).join("");
+          window.D21WireAddToCart(grid, productos);
+        }
+      } catch (err) {
+        showEmpty("No se pudo cargar la categoría", "Revisa tu conexión o la configuración de Supabase en el Panel de Control.");
+      }
+    }
+
+    renderCategoryPage();
+    window.addEventListener("d21:update", renderCategoryPage);
+  })();
+  </script>
+</body>
+</html>
