@@ -1,17 +1,19 @@
 /* =========================================================
-   DISTRITO 21 — Capa de datos (store.js) · Supabase edition
-   Habla directo con la API REST (PostgREST) y Storage de Supabase.
-   Todas las funciones de lectura/escritura son ASYNC (devuelven Promesas).
-   Las credenciales se guardan en localStorage, solo en el navegador
-   de quien administra: no hay servidor propio, Supabase es el backend.
+   DISTRITO 21 — Capa de datos (store.js) · Supabase + Auth
+   Lectura: pública (anon key), vía políticas RLS "for select using (true)".
+   Escritura: requiere sesión real de Supabase Auth (auth.uid() en RLS).
+   El "apikey" (anon key) identifica el proyecto; el "Authorization"
+   lleva el JWT del usuario logueado cuando existe, y si no, el anon key
+   (para que las lecturas públicas sigan funcionando sin login).
    ========================================================= */
 (function (window) {
   "use strict";
 
   const CONFIG_KEY = "d21_supabase_config_v1";
+  const SESSION_KEY = "d21_auth_session_v1";
   const CURRENCY_PREFIX = "Bs. ";
 
-  // ---------------- Configuración ----------------
+  // ---------------- Configuración del proyecto ----------------
   function getConfig() {
     try {
       const raw = localStorage.getItem(CONFIG_KEY);
@@ -30,6 +32,32 @@
   function isConfigured() {
     const c = getConfig();
     return !!(c && c.url && c.key);
+  }
+
+  // ---------------- Sesión de Auth (persistida en localStorage) ----------------
+  function loadSession() {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  function saveSession(data) {
+    if (!data) {
+      localStorage.removeItem(SESSION_KEY);
+      window.dispatchEvent(new CustomEvent("d21:auth-change"));
+      return;
+    }
+    const session = {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      expires_at: Date.now() + (data.expires_in || 3600) * 1000,
+      user: data.user ? { id: data.user.id, email: data.user.email } : null,
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    window.dispatchEvent(new CustomEvent("d21:auth-change"));
+    return session;
   }
 
   // ---------------- Helpers ----------------
@@ -54,15 +82,87 @@
       this.code = "NOT_CONFIGURED";
     }
   }
+  class AuthRequiredError extends Error {
+    constructor(msg) {
+      super(msg || "AUTH_REQUIRED");
+      this.code = "AUTH_REQUIRED";
+    }
+  }
 
+  // ---------------- Auth: login / logout / refresh ----------------
+  async function authFetch(grantPath, body) {
+    const cfg = getConfig();
+    if (!cfg) throw new SupabaseNotConfiguredError();
+    const res = await fetch(`${cfg.url}/auth/v1/token?grant_type=${grantPath}`, {
+      method: "POST",
+      headers: { apikey: cfg.key, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(json.error_description || json.msg || json.error || "No se pudo autenticar");
+    }
+    return json;
+  }
+
+  async function signIn(email, password) {
+    const json = await authFetch("password", { email: email.trim(), password });
+    return saveSession(json);
+  }
+
+  async function signOut() {
+    const session = loadSession();
+    const cfg = getConfig();
+    if (session && cfg) {
+      try {
+        await fetch(`${cfg.url}/auth/v1/logout`, {
+          method: "POST",
+          headers: { apikey: cfg.key, Authorization: `Bearer ${session.access_token}` },
+        });
+      } catch (e) {
+        /* si falla el logout remoto, igual limpiamos la sesión local */
+      }
+    }
+    saveSession(null);
+  }
+
+  // Devuelve un access_token válido para el usuario logueado, refrescándolo si
+  // está por expirar. Si no hay sesión, devuelve null (llamadas de lectura
+  // pública seguirán usando el anon key).
+  async function getValidAccessToken() {
+    const session = loadSession();
+    if (!session) return null;
+    const aboutToExpire = session.expires_at - Date.now() < 60 * 1000;
+    if (!aboutToExpire) return session.access_token;
+    try {
+      const json = await authFetch("refresh_token", { refresh_token: session.refresh_token });
+      const fresh = saveSession(json);
+      return fresh.access_token;
+    } catch (e) {
+      saveSession(null);
+      return null;
+    }
+  }
+
+  function currentUser() {
+    const session = loadSession();
+    return session && session.user ? session.user : null;
+  }
+  function isAuthenticated() {
+    const session = loadSession();
+    return !!session;
+  }
+
+  // ---------------- Cliente REST (PostgREST) ----------------
   async function sb(path, options = {}) {
     const cfg = getConfig();
     if (!cfg) throw new SupabaseNotConfiguredError();
+    const token = (await getValidAccessToken()) || cfg.key;
     const res = await fetch(`${cfg.url}/rest/v1/${path}`, {
       ...options,
       headers: {
         apikey: cfg.key,
-        Authorization: `Bearer ${cfg.key}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
         Prefer: options.prefer || "return=representation",
         ...(options.headers || {}),
@@ -74,6 +174,7 @@
         const j = await res.json();
         msg = j.message || msg;
       } catch (e) {}
+      if (res.status === 401 || res.status === 403) throw new AuthRequiredError(msg);
       throw new Error(msg);
     }
     if (res.status === 204) return null;
@@ -84,13 +185,10 @@
   async function sbCount(path) {
     const cfg = getConfig();
     if (!cfg) throw new SupabaseNotConfiguredError();
+    const token = (await getValidAccessToken()) || cfg.key;
     const res = await fetch(`${cfg.url}/rest/v1/${path}`, {
       method: "HEAD",
-      headers: {
-        apikey: cfg.key,
-        Authorization: `Bearer ${cfg.key}`,
-        Prefer: "count=exact",
-      },
+      headers: { apikey: cfg.key, Authorization: `Bearer ${token}`, Prefer: "count=exact" },
     });
     const range = res.headers.get("content-range");
     if (!range) return 0;
@@ -128,13 +226,20 @@
     setConfig,
     clearConfig,
     SupabaseNotConfiguredError,
+    AuthRequiredError,
+
+    // ---- auth ----
+    signIn,
+    signOut,
+    currentUser,
+    isAuthenticated,
 
     async testConnection() {
       await sb("categorias?select=id&limit=1");
       return true;
     },
 
-    // ---- lectura ----
+    // ---- lectura (pública) ----
     async getCategorias() {
       const rows = await sb("categorias?select=*&order=nombre.asc");
       return rows.map(mapCategoria);
@@ -163,7 +268,7 @@
       return sbCount(`productos?select=id&categoria_id=eq.${catId}`);
     },
 
-    // ---- categorías ----
+    // ---- categorías (requiere sesión) ----
     async addCategoria(nombre, icono) {
       const base = slugify(nombre);
       let slug = base;
@@ -204,13 +309,12 @@
       return rows.length ? mapCategoria(rows[0]) : null;
     },
     async deleteCategoria(id) {
-      // Los productos de esta categoría quedan como "Sin categoría" en vez de borrarse.
       await sb(`productos?categoria_id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ categoria_id: null }) });
       await sb(`categorias?id=eq.${id}`, { method: "DELETE" });
       fireUpdate();
     },
 
-    // ---- productos ----
+    // ---- productos (requiere sesión) ----
     async addProducto(payload) {
       const body = {
         nombre: (payload.nombre || "").trim(),
@@ -245,17 +349,18 @@
       fireUpdate();
     },
 
-    // ---- imágenes (Supabase Storage, bucket público "productos") ----
+    // ---- imágenes (Supabase Storage, bucket público "productos", subida requiere sesión) ----
     async subirImagen(file) {
       const cfg = getConfig();
       if (!cfg) throw new SupabaseNotConfiguredError();
+      const token = (await getValidAccessToken()) || cfg.key;
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
       const path = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const res = await fetch(`${cfg.url}/storage/v1/object/productos/${path}`, {
         method: "POST",
         headers: {
           apikey: cfg.key,
-          Authorization: `Bearer ${cfg.key}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": file.type || "application/octet-stream",
         },
         body: file,
@@ -266,6 +371,7 @@
           const j = await res.json();
           msg = j.message || msg;
         } catch (e) {}
+        if (res.status === 401 || res.status === 403) throw new AuthRequiredError(msg);
         throw new Error(msg);
       }
       return `${cfg.url}/storage/v1/object/public/productos/${path}`;

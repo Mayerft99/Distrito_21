@@ -16,27 +16,37 @@
   <div class="bg-orb orb3"></div>
   <div class="grain"></div>
 
-  <!-- ============ PANTALLA DE ACCESO ============ -->
+  <!-- ============ PANTALLA DE ACCESO (Supabase Auth) ============ -->
   <div id="lockScreen" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
     <div class="glass-strong rounded-3xl p-8 w-full max-w-sm">
       <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2 text-center">Acceso interno</p>
       <h1 class="font-display font-bold text-2xl text-center mb-6">Panel de Control D21</h1>
+
+      <div id="lockNotConfigured" class="hidden text-center space-y-4">
+        <p class="text-sm text-[var(--chalk)]/60">Todavía no conectaste este panel a Supabase.</p>
+        <a href="#" id="lockGotoConfig" class="btn-primary inline-block font-display font-semibold px-6 py-3 rounded-full text-sm uppercase tracking-wider">Conectar ahora</a>
+      </div>
+
       <form id="lockForm" class="space-y-4">
         <div>
-          <label class="font-mono text-[10px] uppercase tracking-widest text-[var(--chalk)]/50 block mb-1.5">Contraseña</label>
-          <input id="lockInput" type="password" placeholder="••••••••" autocomplete="current-password" class="w-full rounded-xl px-4 py-3 text-sm text-center tracking-widest">
+          <label class="font-mono text-[10px] uppercase tracking-widest text-[var(--chalk)]/50 block mb-1.5">Correo</label>
+          <input id="lockEmail" type="email" placeholder="tu@correo.com" autocomplete="username" class="w-full rounded-xl px-4 py-3 text-sm">
         </div>
-        <p id="lockError" class="hidden text-center text-xs text-red-400 font-mono">Contraseña incorrecta</p>
-        <button type="submit" class="w-full btn-primary font-display font-semibold py-3.5 rounded-full text-sm uppercase tracking-wider">Entrar</button>
+        <div>
+          <label class="font-mono text-[10px] uppercase tracking-widest text-[var(--chalk)]/50 block mb-1.5">Contraseña</label>
+          <input id="lockPassword" type="password" placeholder="••••••••" autocomplete="current-password" class="w-full rounded-xl px-4 py-3 text-sm">
+        </div>
+        <p id="lockError" class="hidden text-center text-xs text-red-400 font-mono"></p>
+        <button type="submit" id="lockSubmitBtn" class="w-full btn-primary font-display font-semibold py-3.5 rounded-full text-sm uppercase tracking-wider">Iniciar sesión</button>
       </form>
       <p class="text-center text-[10px] text-[var(--chalk)]/35 font-mono mt-5 leading-relaxed">
-        Contraseña por defecto: <span class="text-[var(--chalk)]/55">admin123</span><br>Cámbiala en la pestaña Configuración.
+        ¿No tienes usuario todavía? Créalo en tu proyecto Supabase → Authentication → Users → Add user.
       </p>
       <a href="index.html" class="block text-center text-[11px] font-mono uppercase tracking-widest text-[var(--chalk)]/40 hover:text-accent mt-5">← Volver a la tienda</a>
     </div>
   </div>
 
-  <!-- ============ PANEL (oculto hasta desbloquear) ============ -->
+  <!-- ============ PANEL (oculto hasta iniciar sesión) ============ -->
   <div id="panelRoot" class="hidden">
 
     <!-- ============ HEADER ============ -->
@@ -198,7 +208,7 @@
               <input id="cfgKey" type="text" placeholder="eyJhbGciOi..." class="w-full rounded-xl px-4 py-3 text-sm">
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
-              <button type="submit" class="flex-1 btn-primary font-display font-semibold py-3.5 rounded-full text-sm uppercase tracking-wider">Guardar y conectar</button>
+              <button type="submit" class="flex-1 btn-primary font-display font-semibold py-3.5 rounded-full text-sm uppercase tracking-wider">Guardar</button>
               <button type="button" id="testConnBtn" class="glass rounded-full px-6 py-3.5 text-sm font-mono uppercase tracking-wider hover:border-[var(--accent)]/50">Probar conexión</button>
             </div>
           </form>
@@ -206,39 +216,33 @@
         </div>
 
         <div class="glass rounded-2xl p-5 sm:p-6">
-          <h2 class="font-display font-bold text-lg mb-1">🔒 Contraseña del panel</h2>
-          <p class="text-sm text-[var(--chalk)]/50 mb-4">Cambia la contraseña para entrar a este panel desde este navegador.</p>
-          <form id="passForm" class="flex flex-col sm:flex-row gap-3">
-            <input id="cfgPass" type="password" placeholder="Nueva contraseña" class="flex-1 rounded-xl px-4 py-3 text-sm">
-            <button type="submit" class="glass rounded-full px-6 py-3 text-xs font-mono uppercase tracking-wider hover:border-[var(--accent)]/50 shrink-0">Actualizar</button>
-          </form>
+          <h2 class="font-display font-bold text-lg mb-1">👤 Cuenta</h2>
+          <p class="text-sm text-[var(--chalk)]/50 mb-4">Sesión activa: <span id="cuentaEmail" class="text-[var(--chalk)]/80 font-mono">—</span></p>
+          <button id="logoutBtn" class="glass rounded-full px-6 py-3 text-xs font-mono uppercase tracking-wider hover:border-red-400/50 hover:text-red-400 transition-colors">Cerrar sesión</button>
         </div>
 
         <div class="glass rounded-2xl p-5 sm:p-6">
           <h2 class="font-display font-bold text-lg mb-3">📋 Cómo configurar Supabase (primera vez)</h2>
           <ol class="space-y-2.5 text-sm text-[var(--chalk)]/65 list-decimal list-inside">
-            <li>Ve a <strong class="text-[var(--chalk)]">supabase.com</strong> y crea una cuenta gratuita.</li>
-            <li>Crea un nuevo proyecto (elige la región más cercana a Bolivia).</li>
-            <li>Abre <strong class="text-[var(--chalk)]">SQL Editor</strong> y pega el contenido completo del archivo <code class="font-mono text-accent">supabase-setup.sql</code> incluido en este proyecto. Ejecuta.</li>
-            <li>Ve a <strong class="text-[var(--chalk)]">Storage</strong> → crea un bucket llamado <code class="font-mono text-accent">productos</code> → márcalo como público.</li>
-            <li>Ve a <strong class="text-[var(--chalk)]">Project Settings → API</strong>, copia la URL y la <em>anon key</em>, pégalas arriba y presiona <strong class="text-[var(--chalk)]">Guardar y conectar</strong>.</li>
+            <li>Ve a <strong class="text-[var(--chalk)]">supabase.com</strong> y crea una cuenta gratuita, luego un nuevo proyecto.</li>
+            <li>Abre <strong class="text-[var(--chalk)]">SQL Editor</strong> y pega el contenido completo de <code class="font-mono text-accent">supabase-setup.sql</code> incluido en este proyecto. Ejecuta.</li>
+            <li>Ve a <strong class="text-[var(--chalk)]">Storage</strong> → crea un bucket llamado <code class="font-mono text-accent">productos</code> → márcalo público.</li>
+            <li>Ve a <strong class="text-[var(--chalk)]">Authentication → Providers → Email</strong> y desactiva <em>"Allow new users to sign up"</em> — este panel no tiene registro público, solo login.</li>
+            <li>Ve a <strong class="text-[var(--chalk)]">Authentication → Users → Add user</strong> y crea tu usuario admin (email + contraseña).</li>
+            <li>Ve a <strong class="text-[var(--chalk)]">Project Settings → API</strong>, copia la URL y la <em>anon key</em>, pégalas arriba y presiona <strong class="text-[var(--chalk)]">Guardar</strong>.</li>
+            <li>Vuelve a la pantalla de acceso e inicia sesión con el usuario que creaste en el paso 5.</li>
           </ol>
         </div>
 
-        <div class="glass rounded-2xl p-5 sm:p-6 border-yellow-500/20">
-          <h2 class="font-display font-bold text-lg mb-2">⚠️ Aviso de seguridad</h2>
-          <p class="text-sm text-[var(--chalk)]/60 leading-relaxed">
-            La contraseña de este panel solo protege el acceso desde este navegador; no es autenticación de servidor.
-            Cualquiera con tu URL y anon key podría escribir directamente contra la API de Supabase.
-            Para bloquear eso de verdad, activa <strong class="text-[var(--chalk)]">Supabase Auth</strong> con un usuario admin
-            y cambia las políticas de escritura en <code class="font-mono text-accent">supabase-setup.sql</code> para exigir
-            <code class="font-mono text-accent">auth.uid()</code>.
-          </p>
-        </div>
-
         <div class="glass rounded-2xl p-5 sm:p-6">
-          <h2 class="font-display font-bold text-lg mb-2">🚪 Sesión</h2>
-          <button id="logoutBtn" class="glass rounded-full px-6 py-3 text-xs font-mono uppercase tracking-wider hover:border-red-400/50 hover:text-red-400 transition-colors">Cerrar sesión en este navegador</button>
+          <h2 class="font-display font-bold text-lg mb-2">🔒 Cómo queda protegido</h2>
+          <p class="text-sm text-[var(--chalk)]/60 leading-relaxed">
+            La lectura del catálogo (lo que ve un visitante) sigue siendo pública. Pero crear, editar o eliminar
+            categorías, productos, o subir imágenes ahora exige una sesión real de Supabase Auth —
+            las políticas de la base de datos verifican <code class="font-mono text-accent">auth.uid()</code>,
+            no una contraseña guardada en el navegador. Alguien con tu anon key puede leer el catálogo,
+            pero no puede escribir nada sin iniciar sesión con una cuenta que tú hayas creado.
+          </p>
         </div>
       </section>
 
@@ -254,34 +258,72 @@
     "use strict";
     const S = window.D21Store;
     const toast = window.D21Toast;
-    const PASS_KEY = "d21_admin_pass_v1";
-    const SESSION_KEY = "d21_admin_session_v1";
 
     function escapeHtml(str){
       return String(str).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
     }
-    function currentPass(){
-      return localStorage.getItem(PASS_KEY) || "admin123";
-    }
 
-    // ---------- LOCK SCREEN ----------
+    // ---------- LOCK SCREEN (Supabase Auth) ----------
     const lockScreen = document.getElementById("lockScreen");
     const panelRoot = document.getElementById("panelRoot");
+    const lockForm = document.getElementById("lockForm");
+    const lockNotConfigured = document.getElementById("lockNotConfigured");
+    const lockError = document.getElementById("lockError");
+    const lockSubmitBtn = document.getElementById("lockSubmitBtn");
+
+    function showLockScreen(){
+      lockScreen.classList.remove("hidden");
+      panelRoot.classList.add("hidden");
+      const configured = S.isConfigured();
+      lockNotConfigured.classList.toggle("hidden", configured);
+      lockForm.classList.toggle("hidden", !configured);
+    }
+
     function unlock(){
       lockScreen.classList.add("hidden");
       panelRoot.classList.remove("hidden");
-      sessionStorage.setItem(SESSION_KEY, "1");
       initPanel();
     }
-    if (sessionStorage.getItem(SESSION_KEY) === "1"){
+
+    document.getElementById("lockGotoConfig").addEventListener("click", (e) => {
+      e.preventDefault();
+      // No hay conexión todavía: mandamos directo a llenar el formulario mostrando el panel en modo config.
+      lockScreen.classList.add("hidden");
+      panelRoot.classList.remove("hidden");
+      initPanel();
+      switchTabGlobal("config");
+    });
+
+    let switchTabGlobal = () => {};
+
+    lockForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      lockError.classList.add("hidden");
+      const email = document.getElementById("lockEmail").value.trim();
+      const password = document.getElementById("lockPassword").value;
+      if (!email || !password){
+        lockError.textContent = "Escribe tu correo y contraseña.";
+        lockError.classList.remove("hidden");
+        return;
+      }
+      lockSubmitBtn.disabled = true;
+      lockSubmitBtn.textContent = "Verificando…";
+      try {
+        await S.signIn(email, password);
+        unlock();
+      } catch (err) {
+        lockError.textContent = err.message || "No se pudo iniciar sesión.";
+        lockError.classList.remove("hidden");
+      } finally {
+        lockSubmitBtn.disabled = false;
+        lockSubmitBtn.textContent = "Iniciar sesión";
+      }
+    });
+
+    if (S.isAuthenticated()){
       unlock();
     } else {
-      document.getElementById("lockForm").addEventListener("submit", e => {
-        e.preventDefault();
-        const val = document.getElementById("lockInput").value;
-        if (val === currentPass()) unlock();
-        else document.getElementById("lockError").classList.remove("hidden");
-      });
+      showLockScreen();
     }
 
     function initPanel(){
@@ -296,6 +338,7 @@
         document.querySelectorAll(".admin-section").forEach(s => s.classList.toggle("active", s.id === "tab-" + tab));
         if (tab === "exportar") refreshExportPreview();
       }
+      switchTabGlobal = switchTab;
 
       // ---------- CONFIGURACIÓN ----------
       const cfg = S.getConfig();
@@ -303,6 +346,9 @@
         document.getElementById("cfgUrl").value = cfg.url;
         document.getElementById("cfgKey").value = cfg.key;
       }
+      const user = S.currentUser();
+      document.getElementById("cuentaEmail").textContent = user ? user.email : "—";
+
       function updateConnBadge(ok){
         const dot = document.getElementById("connDot");
         const text = document.getElementById("connText");
@@ -326,7 +372,7 @@
         status.className = "text-xs font-mono mt-3 text-[var(--chalk)]/50";
         try {
           await S.testConnection();
-          status.textContent = "✅ Conectado correctamente.";
+          status.textContent = "✅ Conectado correctamente. Si aún no iniciaste sesión, cierra sesión y vuelve a entrar.";
           status.className = "text-xs font-mono mt-3 text-[var(--accent)]";
           updateConnBadge(true);
           toast("Conectado a Supabase");
@@ -359,17 +405,8 @@
         }
       });
 
-      document.getElementById("passForm").addEventListener("submit", e => {
-        e.preventDefault();
-        const val = document.getElementById("cfgPass").value.trim();
-        if (!val){ toast("Escribe una contraseña"); return; }
-        localStorage.setItem(PASS_KEY, val);
-        document.getElementById("cfgPass").value = "";
-        toast("Contraseña actualizada");
-      });
-
-      document.getElementById("logoutBtn").addEventListener("click", () => {
-        sessionStorage.removeItem(SESSION_KEY);
+      document.getElementById("logoutBtn").addEventListener("click", async () => {
+        await S.signOut();
         location.reload();
       });
 
@@ -378,6 +415,7 @@
       const catCancelBtn = document.getElementById("catCancelBtn");
       const catFormTitle = document.getElementById("catFormTitle");
       let editingCatId = null;
+      let categoriasCache = [];
 
       function resetCatForm(){
         catForm.reset();
@@ -386,8 +424,6 @@
         catFormTitle.textContent = "Nueva categoría";
         catCancelBtn.classList.add("hidden");
       }
-
-      let categoriasCache = [];
 
       async function renderCategorias(){
         const categorias = await S.getCategorias();
@@ -434,7 +470,7 @@
           }
           resetCatForm();
         } catch (err) {
-          toast("Error: " + err.message);
+          handleWriteError(err);
         }
       });
       catCancelBtn.addEventListener("click", resetCatForm);
@@ -463,7 +499,7 @@
               await S.deleteCategoria(cat.id);
               toast("Categoría eliminada");
               if (editingCatId === cat.id) resetCatForm();
-            } catch (err) { toast("Error: " + err.message); }
+            } catch (err) { handleWriteError(err); }
           }
         }
       });
@@ -539,7 +575,7 @@
           }
           resetProdForm();
         } catch (err) {
-          toast("Error: " + err.message);
+          handleWriteError(err);
         }
       });
       prodCancelBtn.addEventListener("click", resetProdForm);
@@ -556,7 +592,7 @@
           prodForm.imagen.value = url;
           status.textContent = "✅ Imagen subida.";
         } catch (err) {
-          status.textContent = "❌ " + err.message + " — ¿Creaste el bucket público \"productos\" en Storage?";
+          status.textContent = "❌ " + err.message + " — ¿Creaste el bucket público \"productos\" y corriste el SQL de políticas?";
         }
       });
 
@@ -586,7 +622,7 @@
               await S.deleteProducto(p.id);
               toast("Producto eliminado");
               if (editingProdId === p.id) resetProdForm();
-            } catch (err) { toast("Error: " + err.message); }
+            } catch (err) { handleWriteError(err); }
           }
         }
       });
@@ -618,6 +654,16 @@
         }
       });
 
+      // ---------- Manejo de sesión expirada / sin permisos ----------
+      function handleWriteError(err){
+        if (err && err.code === "AUTH_REQUIRED"){
+          toast("Tu sesión expiró. Inicia sesión de nuevo.");
+          setTimeout(() => location.reload(), 1200);
+          return;
+        }
+        toast("Error: " + err.message);
+      }
+
       // ---------- INIT / SYNC ----------
       async function renderAll(){
         const configured = S.isConfigured();
@@ -633,10 +679,14 @@
           await renderProductos();
         } catch (err) {
           updateConnBadge(false);
-          toast("No se pudo conectar a Supabase");
+          if (err && err.code === "AUTH_REQUIRED"){
+            toast("Tu sesión expiró. Inicia sesión de nuevo.");
+            setTimeout(() => location.reload(), 1200);
+          } else {
+            toast("No se pudo conectar a Supabase");
+          }
         }
       }
-      window.__d21RenderAll = renderAll;
       renderAll();
       window.addEventListener("d21:update", renderAll);
     }
