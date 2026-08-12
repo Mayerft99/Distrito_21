@@ -3,115 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Distrito 21</title>
-
-<link rel="stylesheet" href="styles.css">
+<title>DISTRITO 21 — Urban Tech Store</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="relative min-h-screen">
 
-<header>
-    <nav class="menu-superior">
-        <a href="index.html">Inicio</a>
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+  <div class="bg-orb orb3"></div>
+  <div class="grain"></div>
 
-        <a href="https://wa.me/75697356" target="_blank" rel="noopener noreferrer">Contacto</a>
-    </nav>
-        <div id="abrir-carrito" class="carrito-icono">
-        🛒 <span id="contador-carrito">0</span>
-        </div>  
-</header>
-
-<div class="contenedor">
-
-    
-
-    <main class="contenido">
-
-    <div class="bloque-titulo">
-    <h1 class="titulo-principal">Bienvenido a Distrito 21</h1>
-    <p class="texto-presentacion">
-        Moda urbana auténtica para quienes buscan destacar con estilo propio.<br>
-        Tienda virtual con envíos a toda Bolivia.
-</p>
-    <p class="subtitulo">Explora nuestras categorías principales</p>
+  <!-- ============ NAV ============ -->
+  <nav class="fixed top-0 left-0 right-0 z-40 px-4 sm:px-8 py-4">
+    <div class="max-w-7xl mx-auto glass rounded-2xl px-5 sm:px-8 py-3.5 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-full border border-[var(--accent)]/50 flex items-center justify-center font-display font-bold text-sm">21</div>
+        <span class="font-display font-bold tracking-tight text-lg sm:text-xl">DISTRITO<span class="text-accent">21</span></span>
+      </a>
+      <div id="navCategorias" class="hidden md:flex items-center gap-7 font-mono text-xs uppercase tracking-widest text-[var(--chalk)]/70"></div>
+      <div class="flex items-center gap-2">
+        <a href="admin.html" class="hidden sm:flex glass rounded-full px-4 py-2.5 text-[11px] font-mono uppercase tracking-widest hover:border-[var(--accent)]/50 transition-colors">Panel</a>
+        <button id="cartBtn" class="relative glass rounded-full w-11 h-11 flex items-center justify-center hover:border-[var(--accent)]/60 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.94-4.693 2.442-7.152.078-.383-.22-.738-.611-.738H5.106M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /></svg>
+          <span id="cartCount" class="absolute -top-1.5 -right-1.5 bg-[var(--accent)] text-[var(--carbon)] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center font-mono">0</span>
+        </button>
+      </div>
     </div>
+  </nav>
 
-    <section class="grid-categorias">
+  <!-- ============ HERO ============ -->
+  <header class="relative z-10 min-h-[92vh] flex items-center px-4 sm:px-8 pt-28 pb-16">
+    <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-10 items-center">
+      <div class="lg:col-span-7">
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-5">Ropa &amp; calzado urbano · Ed. tecnológica</p>
+        <h1 class="font-display font-bold leading-[0.95] text-5xl sm:text-6xl lg:text-7xl tracking-tight">
+          LA CALLE
+          <br>
+          <span class="text-[var(--chalk)]/40">TIENE</span>
+          <br>
+          <span class="text-accent">ARQUITECTURA</span>
+        </h1>
+        <p class="mt-7 text-[var(--chalk)]/60 text-base sm:text-lg max-w-md leading-relaxed">
+          Piezas construidas para el asfalto. Siluetas versátiles, materiales técnicos y una identidad que no se diluye: esto es Distrito 21.
+        </p>
+        <div class="mt-10 flex flex-wrap items-center gap-4">
+          <a href="#categorias" class="btn-primary font-display font-semibold px-8 py-4 rounded-full text-sm uppercase tracking-wider transition-all">
+            Explorar Catálogo
+          </a>
+          <a href="admin.html" class="glass rounded-full px-6 py-4 text-sm font-mono uppercase tracking-wider hover:border-[var(--accent)]/50 transition-colors flex items-center gap-2">
+            Panel de Control
+          </a>
+        </div>
+      </div>
+      <div class="lg:col-span-5">
+        <div class="glass-card rounded-[2rem] p-2 rotate-2">
+          <img src="https://placehold.co/700x850/141512/f3f1ea?text=DISTRITO+21" alt="Distrito 21" class="rounded-[1.6rem] w-full h-[420px] sm:h-[520px] object-cover">
+        </div>
+      </div>
+    </div>
+  </header>
 
-        <a href="poleras/poleras.html" class="categoria-card">
-            <img src="poleras/poleraOversizeBeige.png" alt="Poleras">
-            <h2>Poleras</h2>
-        </a>
+  <!-- ============ CATEGORIAS ============ -->
+  <main id="categorias" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 py-16">
+    <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">01 — Colecciones</p>
+    <h2 class="font-display font-bold text-3xl sm:text-4xl mb-10">Explora por categoría</h2>
+    <div id="categoryGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"></div>
+  </main>
 
-        <a href="pantalones/pantalones.html" class="categoria-card">
-            <img src="pantalones/pantalonbaggy.png" alt="Pantalones">
-            <h2>Pantalones</h2>
-        </a>
+  <!-- ============ DESTACADOS ============ -->
+  <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 py-16">
+    <div class="flex items-end justify-between mb-10">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">02 — Selección</p>
+        <h2 class="font-display font-bold text-3xl sm:text-4xl">Piezas destacadas</h2>
+      </div>
+    </div>
+    <div id="featuredGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"></div>
+  </section>
 
-        <a href="zapatos/zapatos.html" class="categoria-card">
-            <img src="zapatos/amiriclassiclow.png" alt="Zapatos">
-            <h2>Zapatos</h2>
-        </a>
+  <!-- ============ FOOTER ============ -->
+  <footer class="relative z-10 border-t border-white/5 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 py-10 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <span class="font-display font-bold">DISTRITO<span class="text-accent">21</span></span>
+      <p class="font-mono text-xs text-[var(--chalk)]/40 uppercase tracking-widest">Bolivia · Pedidos por WhatsApp</p>
+    </div>
+  </footer>
 
-        <a href="accesorios/accesorios.html" class="categoria-card">
-            <img src="accesorios/gorra jerry.png" alt="Accesorios">
-            <h2>Accesorios</h2>
-        </a>
+  <!-- ============ CART DRAWER ============ -->
+  <div id="cartOverlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none"></div>
+  <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] z-50 translate-x-full glass-strong flex flex-col">
+    <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
+      <h3 class="font-display font-bold text-xl">Tu Carrito</h3>
+      <button id="cartCloseBtn" class="w-9 h-9 rounded-full glass flex items-center justify-center hover:border-[var(--accent)]/50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <div id="cartItems" class="flex-1 overflow-y-auto px-6 py-4 space-y-4"></div>
+    <div class="px-6 py-5 border-t border-white/10 space-y-4">
+      <div class="flex justify-between font-mono text-sm text-[var(--chalk)]/60">
+        <span>Subtotal</span><span id="cartSubtotal">Bs. 0</span>
+      </div>
+      <div class="flex justify-between font-display font-bold text-lg">
+        <span>Total</span><span id="cartTotal" class="text-accent">Bs. 0</span>
+      </div>
+      <button id="whatsappBtn" class="w-full btn-primary font-display font-semibold py-4 rounded-full text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 004.74 1.2h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.03c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.95-.3-1.63-.6-2.87-1.24-4.74-4.13-4.88-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.4.74-2.09 1-2.38.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.41-.07.64.49.24.58.81 2 .88 2.14.07.14.12.31.02.5-.1.19-.15.31-.29.48-.14.17-.3.37-.43.5-.14.14-.29.29-.13.57.17.28.75 1.24 1.61 2 1.11.99 2.04 1.3 2.32 1.44.28.14.44.12.6-.07.17-.19.71-.83.9-1.11.19-.28.38-.24.63-.14.26.1 1.64.77 1.92.91.28.14.47.21.53.33.07.12.07.68-.17 1.36z"/></svg>
+        Finalizar Pedido por WhatsApp
+      </button>
+    </div>
+  </aside>
 
-    </section>
+  <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-24 opacity-0 z-[60] glass-strong rounded-full px-6 py-3 font-mono text-xs uppercase tracking-widest"></div>
 
-</main>
+  <script src="js/store.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/render.js"></script>
+  <script>
+  (function(){
+    "use strict";
+    const catGrid = document.getElementById("categoryGrid");
+    const featuredGrid = document.getElementById("featuredGrid");
 
-</div>
-    <script src="../js/config.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const imagenes = [
-        "media/fondo1.jpg",
-        "media/fondo2.jpg",
-        "media/fondo3.jpg",
-        "media/fondo4.jpg"
-    ];
+    function loadingState(el, text){
+      el.innerHTML = `<p class="col-span-full text-center text-[var(--chalk)]/40 font-mono text-xs uppercase tracking-widest py-10">${text}</p>`;
+    }
 
-    const imagenAleatoria = imagenes[Math.floor(Math.random() * imagenes.length)];
+    function notConfiguredBanner(){
+      return `
+      <div class="col-span-full glass rounded-2xl p-8 text-center">
+        <p class="font-display font-bold text-lg mb-2">La tienda todavía no está conectada</p>
+        <p class="text-[var(--chalk)]/50 text-sm mb-5 max-w-md mx-auto">Conecta Supabase desde el Panel de Control para empezar a mostrar categorías y productos.</p>
+        <a href="admin.html" class="btn-primary inline-block font-display font-semibold px-7 py-3.5 rounded-full text-sm uppercase tracking-wider">Ir al Panel de Control</a>
+      </div>`;
+    }
 
-    document.body.style.backgroundImage = 
-        `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${imagenAleatoria})`;
+    async function renderHome(){
+      if (!window.D21Store.isConfigured()){
+        document.getElementById("navCategorias").innerHTML = "";
+        catGrid.innerHTML = notConfiguredBanner();
+        featuredGrid.innerHTML = "";
+        return;
+      }
 
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundPosition = "center";
-    document.body.style.backgroundAttachment = "fixed";
-});
+      loadingState(catGrid, "Cargando categorías…");
+      loadingState(featuredGrid, "Cargando productos…");
 
-document.addEventListener("DOMContentLoaded", function() {
-    let lastScrollTop = 0;
-    const header = document.querySelector('header');
+      try {
+        const [categorias, productos] = await Promise.all([
+          window.D21Store.getCategorias(),
+          window.D21Store.getProductos(),
+        ]);
 
-    window.addEventListener('scroll', function() {
-        if (window.innerWidth <= 768) {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        document.getElementById("navCategorias").innerHTML = categorias.map(c =>
+          `<a href="categoria.html?cat=${encodeURIComponent(c.slug)}" class="hover:text-accent transition-colors">${c.nombre}</a>`
+        ).join("");
 
-            // Si subes el dedo (scroll arriba), muestra. Si bajas, oculta.
-            if (scrollTop < lastScrollTop) {
-                header.classList.add('header-visible');
-            } else {
-                header.classList.remove('header-visible');
-            }
-            
-            // Si llegas arriba de todo, lo ocultamos para ver el título principal
-            if (scrollTop <= 20) {
-                header.classList.remove('header-visible');
-            }
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        if (categorias.length === 0){
+          catGrid.innerHTML = `<p class="col-span-full text-center text-[var(--chalk)]/40 font-mono text-xs uppercase tracking-widest py-10">Aún no hay categorías. Crea una desde el Panel de Control.</p>`;
+        } else {
+          const counts = await Promise.all(categorias.map(c => window.D21Store.contarProductosPorCategoria(c.id)));
+          catGrid.innerHTML = categorias.map((c, i) => window.D21CategoryCard(c, counts[i])).join("");
         }
-    }, { passive: true });
-});
 
-</script>
+        const catById = Object.fromEntries(categorias.map(c => [c.id, c]));
+        const activos = productos.filter(p => p.activo !== false).slice(0, 8);
+        if (activos.length === 0){
+          featuredGrid.innerHTML = `<p class="col-span-full text-center text-[var(--chalk)]/40 font-mono text-xs uppercase tracking-widest py-10">Aún no hay productos publicados.</p>`;
+        } else {
+          featuredGrid.innerHTML = activos.map(p => window.D21ProductCard(p, catById[p.categoriaId] ? catById[p.categoriaId].nombre : "")).join("");
+          window.D21WireAddToCart(featuredGrid, productos);
+        }
+      } catch (err) {
+        const msg = err && err.code === "NOT_CONFIGURED"
+          ? "Conecta Supabase desde el Panel de Control para ver el catálogo."
+          : "No se pudo cargar el catálogo. Revisa tu conexión o la configuración de Supabase.";
+        catGrid.innerHTML = `<p class="col-span-full text-center text-red-400/80 font-mono text-xs uppercase tracking-widest py-10">${msg}</p>`;
+        featuredGrid.innerHTML = "";
+      }
+    }
 
-<script src="js/carrito.js"></script>
-<div id="mensaje-carrito" class="mensaje-carrito"></div>
-<footer>
-    <p>© 2026 Distrito 21 - Todos los derechos reservados</p>
-</footer>
+    renderHome();
+    window.addEventListener("d21:update", renderHome);
+  })();
+  </script>
 </body>
 </html>
